@@ -40,14 +40,7 @@ export default function Signup() {
     }
 
     setLoading(false);
-    router.replace("/");
-  }
-
-  function hadleTest() {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-    }, 3000);
+    router.replace("/(auth)/signin/page");
   }
 
   return (

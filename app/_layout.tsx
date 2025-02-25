@@ -1,6 +1,6 @@
 import AuthProvider, { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
-import { Stack } from "expo-router";
+import { router, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 
@@ -17,7 +17,13 @@ function MainLayout() {
 
   useEffect(() => {
     supabase.auth.onAuthStateChange((_event, session) => {
-      console.log("Session user: ", session?.user);
+      if (session) {
+        setAuth(session.user);
+        router.replace("/(panel)/profile/page");
+        return;
+      }
+      setAuth(null);
+      router.replace("/(auth)/signin/page");
     });
   }, []);
 
@@ -25,6 +31,10 @@ function MainLayout() {
     <>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="(auth)/signin/page"
+          options={{ headerShown: false }}
+        />
         <Stack.Screen
           name="(auth)/signup/page"
           options={{ headerShown: false }}

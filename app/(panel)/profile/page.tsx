@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { router } from "expo-router";
 
 export default function Profile() {
-  const { setAuth } = useAuth();
+  const { setAuth, user } = useAuth();
 
   async function handleLogout() {
     const { error } = await supabase.auth.signOut();
@@ -15,12 +15,13 @@ export default function Profile() {
       Alert.alert("Error", "Error trying to signing out. Try again later");
       return;
     }
-    router.replace("/");
   }
 
   return (
     <View style={styles.container}>
       <Text>Profile page</Text>
+      <Text>User: {user?.email}</Text>
+      <Text>Id: {user?.id}</Text>
 
       <Button title="LogOut" onPress={handleLogout} />
     </View>
