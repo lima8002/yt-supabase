@@ -6,11 +6,14 @@ import {
   TextInput,
   View,
   ScrollView,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
 import Colors from "@/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { supabase } from "@/lib/supabase";
 
 export default function Signup() {
   const [name, setName] = useState("");
@@ -18,56 +21,81 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  function handleSignUp() {
-    console.log(name, email, password);
+  async function handleSignUp() {
+    setLoading(true);
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: {
+          name: name,
+        },
+      },
+    });
+
+    if (error) {
+      Alert.alert("Error", error.message);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(false);
+    router.replace("/");
+  }
+
+  function hadleTest() {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+    }, 3000);
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: Colors.zinc }}>
+    <SafeAreaView style={styles.container}>
       <ScrollView style={{ flex: 1 }}>
-        <View style={styles.container}>
-          <View style={styles.header}>
-            <Pressable style={styles.backButton} onPress={() => router.back()}>
-              <Ionicons name="arrow-back" size={24} color={Colors.white} />
-            </Pressable>
-            <Text style={styles.logoText}>
-              Dev <Text style={{ color: Colors.green }}>App</Text>
+        <View style={styles.header}>
+          <Pressable style={styles.backButton} onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color={Colors.white} />
+          </Pressable>
+          <Text style={styles.logoText}>
+            Dev <Text style={{ color: Colors.green }}>App</Text>
+          </Text>
+          <Text style={styles.slogan}>Create Account</Text>
+        </View>
+        <View style={styles.form}>
+          <View>
+            <Text style={styles.label}>Name</Text>
+            <TextInput
+              placeholder="Enter your Name"
+              style={styles.input}
+              value={name}
+              onChangeText={setName}
+            />
+          </View>
+          <View>
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              placeholder="Enter your Email"
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+            />
+          </View>
+          <View>
+            <Text style={styles.label}>Password</Text>
+            <TextInput
+              placeholder="Enter your Password"
+              style={styles.input}
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+            />
+          </View>
+          <Pressable style={styles.button} onPress={handleSignUp}>
+            <Text style={styles.buttonText}>
+              {loading ? "Loading..." : "Sign Up"}
             </Text>
-            <Text style={styles.slogan}>Create Account</Text>
-          </View>
-          <View style={styles.form}>
-            <View>
-              <Text style={styles.label}>Name</Text>
-              <TextInput
-                placeholder="Enter your Name"
-                style={styles.input}
-                value={name}
-                onChangeText={setName}
-              />
-            </View>
-            <View>
-              <Text style={styles.label}>Email</Text>
-              <TextInput
-                placeholder="Enter your Email"
-                style={styles.input}
-                value={email}
-                onChangeText={setEmail}
-              />
-            </View>
-            <View>
-              <Text style={styles.label}>Password</Text>
-              <TextInput
-                placeholder="Enter your Password"
-                style={styles.input}
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-              />
-            </View>
-            <Pressable style={styles.button} onPress={handleSignUp}>
-              <Text style={styles.buttonText}>Sign Up</Text>
-            </Pressable>
-          </View>
+          </Pressable>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -78,6 +106,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 34,
+    backgroundColor: Colors.zinc,
   },
   header: {
     paddingHorizontal: 14,
@@ -101,6 +130,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 16,
     paddingTop: 24,
     paddingHorizontal: 16,
+    paddingBottom: "0%",
   },
   label: {
     color: Colors.zinc,
